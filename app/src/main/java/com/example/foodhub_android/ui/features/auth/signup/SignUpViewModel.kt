@@ -1,12 +1,16 @@
 package com.example.foodhub_android.ui.features.auth.signup
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.foodhub_android.data.FoodApi
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,9 +40,12 @@ class SignUpViewModel @Inject constructor(val foodApi: FoodApi): ViewModel(){
         _name.value=name
     }
     fun onSignUpClick(){
-        _uiState.value=SignUpEvent.Loading
-        _uiState.value=SignUpEvent.Success
-        _navigationEvent.tryEmit(SigupNavigationEvent.NavigateToHome)
+        viewModelScope.launch {
+            _uiState.value=SignUpEvent.Loading
+            delay(2000)
+            _uiState.value=SignUpEvent.Success
+            _navigationEvent.tryEmit(SigupNavigationEvent.NavigateToHome)
+        }
     }
 
 
