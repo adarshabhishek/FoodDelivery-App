@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.foodhub_android.data.FoodApi
+import com.example.foodhub_android.data.models.SignUpRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -42,12 +43,30 @@ class SignUpViewModel @Inject constructor(val foodApi: FoodApi): ViewModel(){
     fun onSignUpClick(){
         viewModelScope.launch {
             _uiState.value=SignUpEvent.Loading
-            delay(2000)
-            _uiState.value=SignUpEvent.Success
-            _navigationEvent.tryEmit(SigupNavigationEvent.NavigateToHome)
+            try {
+                val response=foodApi.signUp(
+                    SignUpRequest(
+                        name = name.value,
+                        email = email.value,
+                        password = password.value
+                    )
+                )
+                if (response.token.isNotEmpty()){
+                    _uiState.value=SignUpEvent.Success
+                    _navigationEvent.emit(SigupNavigationEvent.NavigateToHome)
+                }
+            }catch (e:Exception){
+                e.printStackTrace()
+                _uiState.value=SignUpEvent.Error
+            }
         }
     }
 
+    fun onLoginClicked(){
+        viewModelScope.launch {
+            _navigationEvent.emit(SigupNavigationEvent.NavigateToLogin)
+        }
+    }
 
     sealed  class  SigupNavigationEvent{
         object NavigateToLogin:SigupNavigationEvent()

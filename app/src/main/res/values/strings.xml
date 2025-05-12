@@ -4,7 +4,8 @@
     <string name="welcome">Welcome to</string>
     <string name="food_hub">FoodHub</string>
     <string name="food_hub_desc">Your favourite foods delivered fast at your door.</string>
-    <string name="already_have_account">Already have an account? LogIn</string>
+    <string name="already_have_account">Already have an account?</string>
+    <string name="dont_have_account">Don\'t have an account? Signup</string>
     <string name="sign_with_email">Sign in with email</string>
     <string name="sign_with_facebook">Facebook</string>
     <string name="sign_with_google">Google</string>
@@ -14,4 +15,5 @@
     <string name="password">Password</string>
     <string name="email">E-mail</string>
     <string name="full_name">Full name</string>
+    <string name="sign_in">Sign In</string>
 </resources>

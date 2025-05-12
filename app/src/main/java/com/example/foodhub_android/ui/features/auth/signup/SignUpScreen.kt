@@ -1,5 +1,6 @@
 package com.example.foodhub_android.ui.features.auth.signup
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -23,12 +24,14 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -43,9 +46,16 @@ import com.example.foodhub_android.ui.GroupSocialButtons
 import com.example.foodhub_android.ui.theme.Orange
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.foodhub_android.ui.features.auth.AuthScreenPreview
+import com.example.foodhub_android.ui.navigation.AuthScreen
+import com.example.foodhub_android.ui.navigation.Home
+import com.example.foodhub_android.ui.navigation.Login
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
-fun SignUpScreen(viewModel: SignUpViewModel= hiltViewModel()) {
+fun SignUpScreen(navController: NavController,viewModel: SignUpViewModel= hiltViewModel()) {
     Box(modifier = Modifier.fillMaxSize()) {
         val name = viewModel.name.collectAsStateWithLifecycle()
         val email = viewModel.email.collectAsStateWithLifecycle()
@@ -69,6 +79,23 @@ fun SignUpScreen(viewModel: SignUpViewModel= hiltViewModel()) {
             else -> {
                 loading.value = false
                 erroMessage.value = null
+            }
+        }
+        val context= LocalContext.current
+        LaunchedEffect(true) {
+            viewModel.navigationEvent.collectLatest { event ->
+                when (event) {
+                    is SignUpViewModel.SigupNavigationEvent.NavigateToHome -> {
+                        navController.navigate(Home){
+                            popUpTo(AuthScreen){
+                                inclusive=true
+                            }
+                        }
+                    }
+                    is SignUpViewModel.SigupNavigationEvent.NavigateToLogin -> {
+                        navController.navigate(Login)
+                    }
+                }
             }
         }
 
@@ -128,6 +155,7 @@ fun SignUpScreen(viewModel: SignUpViewModel= hiltViewModel()) {
                 }
             )
             Spacer(modifier = Modifier.size(16.dp))
+            Text(text=erroMessage.value?: "", color = Color.Red)
 
             Button(
                 onClick = viewModel::onSignUpClick, modifier = Modifier.height(48.dp),
@@ -161,7 +189,9 @@ fun SignUpScreen(viewModel: SignUpViewModel= hiltViewModel()) {
                     text = stringResource(id = R.string.already_have_account),
                     modifier = Modifier
                         .padding(8.dp)
-                        .clickable { }.fillMaxWidth(),
+                        .clickable {
+                            viewModel.onLoginClicked()
+                        }.fillMaxWidth(),
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.padding(8.dp))
@@ -177,5 +207,5 @@ fun SignUpScreen(viewModel: SignUpViewModel= hiltViewModel()) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewSignUpScreen(){
-    SignUpScreen()
+    SignUpScreen(rememberNavController())
 }
